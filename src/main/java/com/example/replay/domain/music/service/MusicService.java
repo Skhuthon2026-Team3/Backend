@@ -18,9 +18,12 @@ public class MusicService {
     private static final String ITUNES_SEARCH_URL = "https://itunes.apple.com/search";
     private static final int DEFAULT_LIMIT = 5; //5곡 정보만 사용하기 위해 설정
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final RestClient restClient = RestClient.create();
 
+    public MusicService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
     //음악 검색 메인 메소드
     public List<MusicSearchResponse> searchMusic(String term) {
         if (!StringUtils.hasText(term)) {
