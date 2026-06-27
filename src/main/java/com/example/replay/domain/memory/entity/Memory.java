@@ -54,7 +54,7 @@ public class Memory {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "ai_story", length = 150)
+    @Column(name = "ai_story", length = 100) //AI 글 작성 텍스트란 100자 제한
     private String aiStory;
 
     @Column(name = "is_public", nullable = false)

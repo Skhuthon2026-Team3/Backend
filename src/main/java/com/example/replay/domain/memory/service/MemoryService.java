@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-
-//
+//글 추가/삭제만 기능만 제공 (수정은 불가)
 @Service
 @RequiredArgsConstructor
 public class MemoryService {
@@ -41,5 +40,13 @@ public class MemoryService {
 
         Memory savedMemory = memoryRepository.save(memory);
         return MemoryResponse.from(savedMemory);
+    }
+
+    @Transactional
+    public void deleteMemory(Long memoryId) {
+        Memory memory = memoryRepository.findById(memoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+
+        memoryRepository.delete(memory);
     }
 }

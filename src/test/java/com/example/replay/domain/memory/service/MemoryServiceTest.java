@@ -30,18 +30,7 @@ class MemoryServiceTest {
                 new Member("memory-test@replay.com", "memory-test", SocialProvider.GOOGLE, "memory-test-provider-id")
         );
 
-        MemoryCreateRequest request = new MemoryCreateRequest(
-                member.getId(),
-                "Discharge day",
-                "Wonder",
-                "ADOY",
-                "LOVE",
-                "https://example.com/artwork.jpg",
-                "https://example.com/preview.m4a",
-                "A song I listened to on the KTX after discharge.",
-                null,
-                true
-        );
+        MemoryCreateRequest request = createRequest(member.getId());
 
         MemoryResponse response = memoryService.createMemory(request);
 
@@ -58,5 +47,32 @@ class MemoryServiceTest {
         assertThat(response.aiStory()).isNull();
         assertThat(response.isPublic()).isTrue();
         assertThat(memoryRepository.existsById(response.id())).isTrue();
+    }
+
+    @Test
+    void deleteMemory() {
+        Member member = memberRepository.save(
+                new Member("delete-test@replay.com", "delete-test", SocialProvider.GOOGLE, "delete-test-provider-id")
+        );
+        MemoryResponse response = memoryService.createMemory(createRequest(member.getId()));
+
+        memoryService.deleteMemory(response.id());
+
+        assertThat(memoryRepository.existsById(response.id())).isFalse();
+    }
+
+    private MemoryCreateRequest createRequest(Long memberId) {
+        return new MemoryCreateRequest(
+                memberId,
+                "Discharge day",
+                "Wonder",
+                "ADOY",
+                "LOVE",
+                "https://example.com/artwork.jpg",
+                "https://example.com/preview.m4a",
+                "A song I listened to on the KTX after discharge.",
+                null,
+                true
+        );
     }
 }
