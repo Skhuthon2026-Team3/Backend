@@ -1,0 +1,45 @@
+package com.example.replay.domain.memory.service;
+
+import com.example.replay.domain.member.entity.Member;
+import com.example.replay.domain.member.repository.MemberRepository;
+import com.example.replay.domain.memory.dto.MemoryCreateRequest;
+import com.example.replay.domain.memory.dto.MemoryResponse;
+import com.example.replay.domain.memory.entity.Memory;
+import com.example.replay.domain.memory.repository.MemoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+
+//
+@Service
+@RequiredArgsConstructor
+public class MemoryService {
+
+    private final MemberRepository memberRepository;
+    private final MemoryRepository memoryRepository;
+
+    @Transactional
+    public MemoryResponse createMemory(MemoryCreateRequest request) {
+        Member member = memberRepository.findById(request.memberId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
+
+        Memory memory = new Memory(
+                member,
+                request.title(),
+                request.trackName(),
+                request.artistName(),
+                request.albumName(),
+                request.artworkUrl(),
+                request.previewUrl(),
+                request.content(),
+                request.aiStory(),
+                request.isPublic()
+        );
+
+        Memory savedMemory = memoryRepository.save(memory);
+        return MemoryResponse.from(savedMemory);
+    }
+}
