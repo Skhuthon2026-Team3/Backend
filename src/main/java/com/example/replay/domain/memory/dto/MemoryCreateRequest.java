@@ -9,6 +9,7 @@ public record MemoryCreateRequest(
         Long memberId,
 
         @NotBlank
+        @Size(max = 100)
         String title,
 
         @NotBlank

@@ -43,9 +43,13 @@ public class MemoryService {
     }
 
     @Transactional
-    public void deleteMemory(Long memoryId) {
+    public void deleteMemory(Long memoryId, Long memberId) {
         Memory memory = memoryRepository.findById(memoryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+
+        if (!memory.getMember().getId().equals(memberId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the owner can delete this memory.");
+        }
 
         memoryRepository.delete(memory);
     }

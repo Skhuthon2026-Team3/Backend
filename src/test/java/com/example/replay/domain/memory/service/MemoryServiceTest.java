@@ -1,6 +1,7 @@
 package com.example.replay.domain.memory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.replay.domain.member.entity.Member;
 import com.example.replay.domain.member.entity.SocialProvider;
@@ -11,6 +12,7 @@ import com.example.replay.domain.memory.repository.MemoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 class MemoryServiceTest {
@@ -56,11 +58,27 @@ class MemoryServiceTest {
         );
         MemoryResponse response = memoryService.createMemory(createRequest(member.getId()));
 
-        memoryService.deleteMemory(response.id());
+        memoryService.deleteMemory(response.id(), member.getId());
 
         assertThat(memoryRepository.existsById(response.id())).isFalse();
     }
 
+    @Test
+    void deleteMemoryForbiddenWhenMemberIsNotOwner() {
+        Member owner = memberRepository.save(
+                new Member("owner-test@replay.com", "owner-test", SocialProvider.GOOGLE, "owner-test-provider-id")
+        );
+        Member other = memberRepository.save(
+                new Member("other-test@replay.com", "other-test", SocialProvider.GOOGLE, "other-test-provider-id")
+        );
+        MemoryResponse response = memoryService.createMemory(createRequest(owner.getId()));
+
+        assertThatThrownBy(() -> memoryService.deleteMemory(response.id(), other.getId()))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("403 FORBIDDEN");
+
+        assertThat(memoryRepository.existsById(response.id())).isTrue();
+    }
     private MemoryCreateRequest createRequest(Long memberId) {
         return new MemoryCreateRequest(
                 memberId,
