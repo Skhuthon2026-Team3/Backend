@@ -3,16 +3,18 @@ package com.example.replay.domain.memory.service;
 import com.example.replay.domain.member.entity.Member;
 import com.example.replay.domain.member.repository.MemberRepository;
 import com.example.replay.domain.memory.dto.MemoryCreateRequest;
+import com.example.replay.domain.memory.dto.MemoryDetailResponse;
+import com.example.replay.domain.memory.dto.MemoryListResponse;
 import com.example.replay.domain.memory.dto.MemoryResponse;
 import com.example.replay.domain.memory.entity.Memory;
 import com.example.replay.domain.memory.repository.MemoryRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-//글 추가/삭제만 기능만 제공 (수정은 불가)
 @Service
 @RequiredArgsConstructor
 public class MemoryService {
@@ -22,8 +24,7 @@ public class MemoryService {
 
     @Transactional
     public MemoryResponse createMemory(MemoryCreateRequest request) {
-        Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
+        Member member = getMember(request.memberId());
 
         Memory memory = new Memory(
                 member,
@@ -42,6 +43,25 @@ public class MemoryService {
         return MemoryResponse.from(savedMemory);
     }
 
+    @Transactional(readOnly = true)
+    public List<MemoryListResponse> getMyMemories(Long memberId) {
+        Member member = getMember(memberId);
+
+        return memoryRepository.findByMemberOrderByCreatedAtDesc(member).stream()
+                .map(MemoryListResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MemoryDetailResponse getMyMemoryDetail(Long memoryId, Long memberId) {
+        Member member = getMember(memberId);
+
+        Memory memory = memoryRepository.findByIdAndMember(memoryId, member)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+
+        return MemoryDetailResponse.from(memory);
+    }
+
     @Transactional
     public void deleteMemory(Long memoryId, Long memberId) {
         Memory memory = memoryRepository.findById(memoryId)
@@ -52,5 +72,10 @@ public class MemoryService {
         }
 
         memoryRepository.delete(memory);
+    }
+
+    private Member getMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
     }
 }
