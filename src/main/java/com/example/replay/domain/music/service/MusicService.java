@@ -16,7 +16,7 @@ import org.springframework.web.util.UriBuilder;
 public class MusicService {
 
     private static final String ITUNES_SEARCH_URL = "https://itunes.apple.com/search";
-    private static final int DEFAULT_LIMIT = 5; //5곡 정보만 사용하기 위해 설정
+    private static final int DEFAULT_LIMIT = 5;
 
     private final ObjectMapper objectMapper;
     private final RestClient restClient = RestClient.create();
@@ -24,7 +24,6 @@ public class MusicService {
     public MusicService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-    //음악 검색 메인 메소드
     public List<MusicSearchResponse> searchMusic(String term) {
         if (!StringUtils.hasText(term)) {
             return Collections.emptyList();
@@ -46,7 +45,6 @@ public class MusicService {
                 .toList();
     }
 
-    //iTunes에서 받은 응답 문자열 java DTO로 변환
     private ItunesSearchResponse parseItunesResponse(String responseBody) {
         if (!StringUtils.hasText(responseBody)) {
             return null;
@@ -59,7 +57,6 @@ public class MusicService {
         }
     }
 
-    //요청 URL 만드는 메소드
     private URI buildSearchUri(UriBuilder uriBuilder, String term) {
         return uriBuilder
                 .queryParam("term", term)
