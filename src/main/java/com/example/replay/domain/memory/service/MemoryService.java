@@ -62,6 +62,13 @@ public class MemoryService {
         return MemoryDetailResponse.from(memory);
     }
 
+    @Transactional(readOnly = true)
+    public List<MemoryListResponse> getRecentPublicMemories() {
+        return memoryRepository.findTop3ByIsPublicTrueOrderByCreatedAtDesc().stream()
+                .map(MemoryListResponse::from)
+                .toList();
+    }
+
     @Transactional
     public void deleteMemory(Long memoryId, Long memberId) {
         Memory memory = memoryRepository.findById(memoryId)

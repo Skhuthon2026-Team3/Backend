@@ -11,4 +11,6 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
     List<Memory> findByMemberOrderByCreatedAtDesc(Member member);
 
     Optional<Memory> findByIdAndMember(Long id, Member member);
+
+    List<Memory> findTop3ByIsPublicTrueOrderByCreatedAtDesc();
 }

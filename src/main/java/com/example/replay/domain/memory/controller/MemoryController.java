@@ -43,6 +43,12 @@ public class MemoryController {
         return memoryService.getMyMemories(memberId);
     }
 
+    @Operation(summary = "Get recent public memories", description = "Get the latest 3 public memories for the main page.")
+    @GetMapping("/recent")
+    public List<MemoryListResponse> getRecentPublicMemories() {
+        return memoryService.getRecentPublicMemories();
+    }
+
     @Operation(summary = "Get my memory detail", description = "Get a saved memory detail by id.")
     @GetMapping("/{memoryId}")
     public MemoryDetailResponse getMyMemoryDetail(@PathVariable Long memoryId, @RequestParam Long memberId) {

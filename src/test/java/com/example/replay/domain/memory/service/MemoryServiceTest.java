@@ -111,6 +111,32 @@ class MemoryServiceTest {
     }
 
     @Test
+    void getRecentPublicMemories() throws InterruptedException {
+        Member member = memberRepository.save(
+                new Member("recent-test@replay.com", "recent-test", SocialProvider.GOOGLE, "recent-test-provider-id")
+        );
+
+        MemoryResponse firstPublic = memoryService.createMemory(createRequest(member.getId(), "First public", true));
+        Thread.sleep(5);
+        memoryService.createMemory(createRequest(member.getId(), "Private memory", false));
+        Thread.sleep(5);
+        MemoryResponse secondPublic = memoryService.createMemory(createRequest(member.getId(), "Second public", true));
+        Thread.sleep(5);
+        MemoryResponse thirdPublic = memoryService.createMemory(createRequest(member.getId(), "Third public", true));
+        Thread.sleep(5);
+        MemoryResponse fourthPublic = memoryService.createMemory(createRequest(member.getId(), "Fourth public", true));
+
+        List<MemoryListResponse> memories = memoryService.getRecentPublicMemories();
+
+        assertThat(memories).hasSize(3);
+        assertThat(memories).extracting(MemoryListResponse::memoryId)
+                .containsExactly(fourthPublic.id(), thirdPublic.id(), secondPublic.id())
+                .doesNotContain(firstPublic.id());
+        assertThat(memories).extracting(MemoryListResponse::title)
+                .doesNotContain("Private memory");
+        assertThat(memories).allSatisfy(memory -> assertThat(memory.isPublic()).isTrue());
+    }
+    @Test
     void deleteMemory() {
         Member member = memberRepository.save(
                 new Member("delete-test@replay.com", "delete-test", SocialProvider.GOOGLE, "delete-test-provider-id")
@@ -139,6 +165,20 @@ class MemoryServiceTest {
         assertThat(memoryRepository.existsById(response.id())).isTrue();
     }
 
+    private MemoryCreateRequest createRequest(Long memberId, String title, Boolean isPublic) {
+        return new MemoryCreateRequest(
+                memberId,
+                title,
+                "Wonder",
+                "ADOY",
+                "LOVE",
+                "https://example.com/artwork.jpg",
+                "https://example.com/preview.m4a",
+                "A song I listened to on the KTX after discharge.",
+                null,
+                isPublic
+        );
+    }
     private MemoryCreateRequest createRequest(Long memberId) {
         return new MemoryCreateRequest(
                 memberId,
