@@ -1,5 +1,7 @@
 package com.example.replay.domain.auth.jwt;
 
+import com.example.replay.common.exception.ErrorCode;
+import com.example.replay.domain.auth.handler.RestAuthenticationEntryPoint;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (RuntimeException ignored) {
                 SecurityContextHolder.clearContext();
+                request.setAttribute(RestAuthenticationEntryPoint.AUTH_ERROR_CODE_ATTRIBUTE, ErrorCode.INVALID_TOKEN);
             }
         }
 

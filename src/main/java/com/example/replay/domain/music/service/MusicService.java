@@ -1,5 +1,7 @@
 package com.example.replay.domain.music.service;
 
+import com.example.replay.common.exception.BusinessException;
+import com.example.replay.common.exception.ErrorCode;
 import com.example.replay.domain.music.dto.ItunesSearchResponse;
 import com.example.replay.domain.music.dto.MusicSearchResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +26,7 @@ public class MusicService {
     public MusicService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+
     public List<MusicSearchResponse> searchMusic(String term) {
         if (!StringUtils.hasText(term)) {
             return Collections.emptyList();
@@ -53,7 +56,7 @@ public class MusicService {
         try {
             return objectMapper.readValue(responseBody, ItunesSearchResponse.class);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to parse iTunes search response.", e);
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, e);
         }
     }
 

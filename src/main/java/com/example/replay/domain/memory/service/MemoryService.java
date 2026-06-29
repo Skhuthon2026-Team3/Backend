@@ -1,5 +1,7 @@
 package com.example.replay.domain.memory.service;
 
+import com.example.replay.common.exception.BusinessException;
+import com.example.replay.common.exception.ErrorCode;
 import com.example.replay.domain.member.entity.Member;
 import com.example.replay.domain.member.repository.MemberRepository;
 import com.example.replay.domain.memory.dto.MemoryCreateRequest;
@@ -10,10 +12,8 @@ import com.example.replay.domain.memory.entity.Memory;
 import com.example.replay.domain.memory.repository.MemoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +57,7 @@ public class MemoryService {
         Member member = getMember(memberId);
 
         Memory memory = memoryRepository.findByIdAndMember(memoryId, member)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMORY_NOT_FOUND));
 
         return MemoryDetailResponse.from(memory);
     }
@@ -65,7 +65,7 @@ public class MemoryService {
     @Transactional(readOnly = true)
     public MemoryDetailResponse getPublicMemoryDetail(Long memoryId) {
         Memory memory = memoryRepository.findByIdAndIsPublicTrue(memoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMORY_NOT_FOUND));
 
         return MemoryDetailResponse.from(memory);
     }
@@ -80,10 +80,10 @@ public class MemoryService {
     @Transactional
     public void deleteMemory(Long memoryId, Long memberId) {
         Memory memory = memoryRepository.findById(memoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMORY_NOT_FOUND));
 
         if (!memory.getMember().getId().equals(memberId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the owner can delete this memory.");
+            throw new BusinessException(ErrorCode.FORBIDDEN_MEMORY_ACCESS);
         }
 
         memoryRepository.delete(memory);
@@ -91,6 +91,6 @@ public class MemoryService {
 
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

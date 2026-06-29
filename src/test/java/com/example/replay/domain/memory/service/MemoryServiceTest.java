@@ -3,6 +3,8 @@ package com.example.replay.domain.memory.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.replay.common.exception.BusinessException;
+import com.example.replay.common.exception.ErrorCode;
 import com.example.replay.domain.member.entity.Member;
 import com.example.replay.domain.member.entity.SocialProvider;
 import com.example.replay.domain.member.repository.MemberRepository;
@@ -15,7 +17,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 class MemoryServiceTest {
@@ -106,8 +107,9 @@ class MemoryServiceTest {
         MemoryResponse response = memoryService.createMemory(owner.getId(), createRequest());
 
         assertThatThrownBy(() -> memoryService.getMyMemoryDetail(response.id(), other.getId()))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("404 NOT_FOUND");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.MEMORY_NOT_FOUND);
     }
 
     @Test
@@ -133,15 +135,17 @@ class MemoryServiceTest {
         MemoryResponse response = memoryService.createMemory(member.getId(), createRequest("Private detail", false));
 
         assertThatThrownBy(() -> memoryService.getPublicMemoryDetail(response.id()))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("404 NOT_FOUND");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.MEMORY_NOT_FOUND);
     }
 
     @Test
     void getPublicMemoryDetailNotFoundWhenMemoryDoesNotExist() {
         assertThatThrownBy(() -> memoryService.getPublicMemoryDetail(999999L))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("404 NOT_FOUND");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.MEMORY_NOT_FOUND);
     }
 
     @Test
@@ -194,8 +198,9 @@ class MemoryServiceTest {
         MemoryResponse response = memoryService.createMemory(owner.getId(), createRequest());
 
         assertThatThrownBy(() -> memoryService.deleteMemory(response.id(), other.getId()))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("403 FORBIDDEN");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.FORBIDDEN_MEMORY_ACCESS);
 
         assertThat(memoryRepository.existsById(response.id())).isTrue();
     }
