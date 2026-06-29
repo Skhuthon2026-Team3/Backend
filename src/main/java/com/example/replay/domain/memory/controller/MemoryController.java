@@ -54,6 +54,12 @@ public class MemoryController {
         return memoryService.getRecentPublicMemories();
     }
 
+    @Operation(summary = "Get public memory detail", description = "Get a public memory detail without login.")
+    @GetMapping("/public/{memoryId}")
+    public MemoryDetailResponse getPublicMemoryDetail(@PathVariable Long memoryId) {
+        return memoryService.getPublicMemoryDetail(memoryId);
+    }
+
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get my memory detail", description = "Get a saved memory detail by id.")
     @GetMapping("/{memoryId}")

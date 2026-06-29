@@ -34,7 +34,12 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/music/search", "/api/memories/recent").permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/music/search",
+                                "/api/memories/recent",
+                                "/api/memories/public/**"
+                        ).permitAll()
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/login/oauth2/**",

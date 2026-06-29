@@ -111,6 +111,40 @@ class MemoryServiceTest {
     }
 
     @Test
+    void getPublicMemoryDetail() {
+        Member member = memberRepository.save(
+                new Member("public-detail@replay.com", "public-detail", SocialProvider.GOOGLE, "public-detail-provider-id")
+        );
+        MemoryResponse response = memoryService.createMemory(member.getId(), createRequest("Public detail", true));
+
+        MemoryDetailResponse detail = memoryService.getPublicMemoryDetail(response.id());
+
+        assertThat(detail.memoryId()).isEqualTo(response.id());
+        assertThat(detail.title()).isEqualTo("Public detail");
+        assertThat(detail.content()).isEqualTo("A song I listened to on the KTX after discharge.");
+        assertThat(detail.isPublic()).isTrue();
+    }
+
+    @Test
+    void getPublicMemoryDetailNotFoundWhenMemoryIsPrivate() {
+        Member member = memberRepository.save(
+                new Member("private-detail@replay.com", "private-detail", SocialProvider.GOOGLE, "private-detail-provider-id")
+        );
+        MemoryResponse response = memoryService.createMemory(member.getId(), createRequest("Private detail", false));
+
+        assertThatThrownBy(() -> memoryService.getPublicMemoryDetail(response.id()))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("404 NOT_FOUND");
+    }
+
+    @Test
+    void getPublicMemoryDetailNotFoundWhenMemoryDoesNotExist() {
+        assertThatThrownBy(() -> memoryService.getPublicMemoryDetail(999999L))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("404 NOT_FOUND");
+    }
+
+    @Test
     void getRecentPublicMemories() throws InterruptedException {
         Member member = memberRepository.save(
                 new Member("recent-test@replay.com", "recent-test", SocialProvider.GOOGLE, "recent-test-provider-id")

@@ -63,6 +63,14 @@ public class MemoryService {
     }
 
     @Transactional(readOnly = true)
+    public MemoryDetailResponse getPublicMemoryDetail(Long memoryId) {
+        Memory memory = memoryRepository.findByIdAndIsPublicTrue(memoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Memory not found."));
+
+        return MemoryDetailResponse.from(memory);
+    }
+
+    @Transactional(readOnly = true)
     public List<MemoryListResponse> getRecentPublicMemories() {
         return memoryRepository.findTop3ByIsPublicTrueOrderByCreatedAtDesc().stream()
                 .map(MemoryListResponse::from)
