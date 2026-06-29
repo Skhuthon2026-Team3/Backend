@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record MemoryCreateRequest(
-        @NotNull
-        Long memberId,
-
         @NotBlank
         @Size(max = 100)
         String title,

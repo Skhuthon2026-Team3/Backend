@@ -23,8 +23,8 @@ public class MemoryService {
     private final MemoryRepository memoryRepository;
 
     @Transactional
-    public MemoryResponse createMemory(MemoryCreateRequest request) {
-        Member member = getMember(request.memberId());
+    public MemoryResponse createMemory(Long memberId, MemoryCreateRequest request) {
+        Member member = getMember(memberId);
 
         Memory memory = new Memory(
                 member,

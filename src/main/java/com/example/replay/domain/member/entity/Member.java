@@ -45,6 +45,8 @@ public class Member {
     @Column(name = "provider_id", length = 100)
     private String providerId; // 소셜 로그인 제공자가 주는 고유 id
 
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt; //회원생성
 
@@ -52,10 +54,21 @@ public class Member {
     private LocalDateTime updatedAt; //업데이트 시간
 
     public Member(String email, String nickname, SocialProvider provider, String providerId) {
+        this(email, nickname, provider, providerId, null);
+    }
+
+    public Member(String email, String nickname, SocialProvider provider, String providerId, String profileImageUrl) {
         this.email = email;
         this.nickname = nickname;
         this.provider = provider;
         this.providerId = providerId;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateSocialProfile(String email, String nickname, String profileImageUrl) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
     }
 
     @PrePersist

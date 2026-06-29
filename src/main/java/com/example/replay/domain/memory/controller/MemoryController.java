@@ -6,18 +6,19 @@ import com.example.replay.domain.memory.dto.MemoryListResponse;
 import com.example.replay.domain.memory.dto.MemoryResponse;
 import com.example.replay.domain.memory.service.MemoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,17 +30,21 @@ public class MemoryController {
 
     private final MemoryService memoryService;
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Create memory", description = "Save a memory with selected music information.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MemoryResponse createMemory(@Valid @RequestBody MemoryCreateRequest request) {
-        return memoryService.createMemory(request);
+    public MemoryResponse createMemory(
+            @AuthenticationPrincipal Long memberId,
+            @Valid @RequestBody MemoryCreateRequest request
+    ) {
+        return memoryService.createMemory(memberId, request);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get my memories", description = "Get memories written by the current member.")
     @GetMapping("/me")
-    public List<MemoryListResponse> getMyMemories(@RequestParam Long memberId) {
-        // TODO: Replace memberId request parameter with authenticated member when login is implemented.
+    public List<MemoryListResponse> getMyMemories(@AuthenticationPrincipal Long memberId) {
         return memoryService.getMyMemories(memberId);
     }
 
@@ -49,17 +54,21 @@ public class MemoryController {
         return memoryService.getRecentPublicMemories();
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get my memory detail", description = "Get a saved memory detail by id.")
     @GetMapping("/{memoryId}")
-    public MemoryDetailResponse getMyMemoryDetail(@PathVariable Long memoryId, @RequestParam Long memberId) {
-        // TODO: Replace memberId request parameter with authenticated member and verify ownership when login is implemented.
+    public MemoryDetailResponse getMyMemoryDetail(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable Long memoryId
+    ) {
         return memoryService.getMyMemoryDetail(memoryId, memberId);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Delete memory", description = "Delete a saved memory by id.")
     @DeleteMapping("/{memoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMemory(@PathVariable Long memoryId, @RequestParam Long memberId) {
+    public void deleteMemory(@AuthenticationPrincipal Long memberId, @PathVariable Long memoryId) {
         memoryService.deleteMemory(memoryId, memberId);
     }
 }

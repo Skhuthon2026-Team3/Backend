@@ -35,9 +35,9 @@ class MemoryServiceTest {
                 new Member("memory-test@replay.com", "memory-test", SocialProvider.GOOGLE, "memory-test-provider-id")
         );
 
-        MemoryCreateRequest request = createRequest(member.getId());
+        MemoryCreateRequest request = createRequest();
 
-        MemoryResponse response = memoryService.createMemory(request);
+        MemoryResponse response = memoryService.createMemory(member.getId(), request);
 
         assertThat(response.id()).isNotNull();
         assertThat(response.memberId()).isEqualTo(member.getId());
@@ -59,7 +59,7 @@ class MemoryServiceTest {
         Member member = memberRepository.save(
                 new Member("list-test@replay.com", "list-test", SocialProvider.GOOGLE, "list-test-provider-id")
         );
-        MemoryResponse response = memoryService.createMemory(createRequest(member.getId()));
+        MemoryResponse response = memoryService.createMemory(member.getId(), createRequest());
 
         List<MemoryListResponse> memories = memoryService.getMyMemories(member.getId());
 
@@ -79,7 +79,7 @@ class MemoryServiceTest {
         Member member = memberRepository.save(
                 new Member("detail-test@replay.com", "detail-test", SocialProvider.GOOGLE, "detail-test-provider-id")
         );
-        MemoryResponse response = memoryService.createMemory(createRequest(member.getId()));
+        MemoryResponse response = memoryService.createMemory(member.getId(), createRequest());
 
         MemoryDetailResponse detail = memoryService.getMyMemoryDetail(response.id(), member.getId());
 
@@ -103,7 +103,7 @@ class MemoryServiceTest {
         Member other = memberRepository.save(
                 new Member("detail-other@replay.com", "detail-other", SocialProvider.GOOGLE, "detail-other-provider-id")
         );
-        MemoryResponse response = memoryService.createMemory(createRequest(owner.getId()));
+        MemoryResponse response = memoryService.createMemory(owner.getId(), createRequest());
 
         assertThatThrownBy(() -> memoryService.getMyMemoryDetail(response.id(), other.getId()))
                 .isInstanceOf(ResponseStatusException.class)
@@ -116,15 +116,15 @@ class MemoryServiceTest {
                 new Member("recent-test@replay.com", "recent-test", SocialProvider.GOOGLE, "recent-test-provider-id")
         );
 
-        MemoryResponse firstPublic = memoryService.createMemory(createRequest(member.getId(), "First public", true));
+        MemoryResponse firstPublic = memoryService.createMemory(member.getId(), createRequest("First public", true));
         Thread.sleep(5);
-        memoryService.createMemory(createRequest(member.getId(), "Private memory", false));
+        memoryService.createMemory(member.getId(), createRequest("Private memory", false));
         Thread.sleep(5);
-        MemoryResponse secondPublic = memoryService.createMemory(createRequest(member.getId(), "Second public", true));
+        MemoryResponse secondPublic = memoryService.createMemory(member.getId(), createRequest("Second public", true));
         Thread.sleep(5);
-        MemoryResponse thirdPublic = memoryService.createMemory(createRequest(member.getId(), "Third public", true));
+        MemoryResponse thirdPublic = memoryService.createMemory(member.getId(), createRequest("Third public", true));
         Thread.sleep(5);
-        MemoryResponse fourthPublic = memoryService.createMemory(createRequest(member.getId(), "Fourth public", true));
+        MemoryResponse fourthPublic = memoryService.createMemory(member.getId(), createRequest("Fourth public", true));
 
         List<MemoryListResponse> memories = memoryService.getRecentPublicMemories();
 
@@ -136,12 +136,13 @@ class MemoryServiceTest {
                 .doesNotContain("Private memory");
         assertThat(memories).allSatisfy(memory -> assertThat(memory.isPublic()).isTrue());
     }
+
     @Test
     void deleteMemory() {
         Member member = memberRepository.save(
                 new Member("delete-test@replay.com", "delete-test", SocialProvider.GOOGLE, "delete-test-provider-id")
         );
-        MemoryResponse response = memoryService.createMemory(createRequest(member.getId()));
+        MemoryResponse response = memoryService.createMemory(member.getId(), createRequest());
 
         memoryService.deleteMemory(response.id(), member.getId());
 
@@ -156,7 +157,7 @@ class MemoryServiceTest {
         Member other = memberRepository.save(
                 new Member("other-test@replay.com", "other-test", SocialProvider.GOOGLE, "other-test-provider-id")
         );
-        MemoryResponse response = memoryService.createMemory(createRequest(owner.getId()));
+        MemoryResponse response = memoryService.createMemory(owner.getId(), createRequest());
 
         assertThatThrownBy(() -> memoryService.deleteMemory(response.id(), other.getId()))
                 .isInstanceOf(ResponseStatusException.class)
@@ -165,9 +166,8 @@ class MemoryServiceTest {
         assertThat(memoryRepository.existsById(response.id())).isTrue();
     }
 
-    private MemoryCreateRequest createRequest(Long memberId, String title, Boolean isPublic) {
+    private MemoryCreateRequest createRequest(String title, Boolean isPublic) {
         return new MemoryCreateRequest(
-                memberId,
                 title,
                 "Wonder",
                 "ADOY",
@@ -179,18 +179,8 @@ class MemoryServiceTest {
                 isPublic
         );
     }
-    private MemoryCreateRequest createRequest(Long memberId) {
-        return new MemoryCreateRequest(
-                memberId,
-                "Discharge day",
-                "Wonder",
-                "ADOY",
-                "LOVE",
-                "https://example.com/artwork.jpg",
-                "https://example.com/preview.m4a",
-                "A song I listened to on the KTX after discharge.",
-                null,
-                true
-        );
+
+    private MemoryCreateRequest createRequest() {
+        return createRequest("Discharge day", true);
     }
 }
