@@ -47,5 +47,5 @@ spring:
             user-name-attribute: id
 
 jwt:
-  secret: ${JWT_SECRET:replay-local-dev-secret-key-must-be-at-least-32-bytes}
-  access-token-expiration-millis: ${JWT_ACCESS_TOKEN_EXPIRATION_MILLIS:3600000}
+  secret: ${JWT_SECRET}
+  access-token-expiration-millis: ${JWT_ACCESS_TOKEN_EXPIRATION_MILLIS}
