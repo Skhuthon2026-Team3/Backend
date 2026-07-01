@@ -43,3 +43,8 @@ spring:
 jwt:
   secret: replay-test-secret-key-must-be-at-least-32-bytes
   access-token-expiration-millis: 3600000
+
+ai:
+  server:
+    url: https://ai-2g3y.onrender.com
+
