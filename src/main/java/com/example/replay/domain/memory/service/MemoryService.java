@@ -72,7 +72,7 @@ public class MemoryService {
 
     @Transactional(readOnly = true)
     public List<MemoryListResponse> getRecentPublicMemories() {
-        return memoryRepository.findTop3ByIsPublicTrueOrderByCreatedAtDesc().stream()
+        return memoryRepository.findTop8ByIsPublicTrueOrderByCreatedAtDesc().stream()
                 .map(MemoryListResponse::from)
                 .toList();
     }

@@ -49,7 +49,7 @@ public class MemoryController {
         return ApiResponse.success(memoryService.getMyMemories(memberId));
     }
 
-    @Operation(summary = "Get recent public memories", description = "Get the latest 3 public memories for the main page.")
+    @Operation(summary = "Get recent public memories", description = "Get the latest 8 public memories for the main page.")
     @GetMapping("/recent")
     public ApiResponse<List<MemoryListResponse>> getRecentPublicMemories() {
         return ApiResponse.success(memoryService.getRecentPublicMemories());

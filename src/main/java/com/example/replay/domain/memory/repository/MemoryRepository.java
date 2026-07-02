@@ -14,5 +14,5 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
 
     Optional<Memory> findByIdAndIsPublicTrue(Long id);
 
-    List<Memory> findTop3ByIsPublicTrueOrderByCreatedAtDesc();
+    List<Memory> findTop8ByIsPublicTrueOrderByCreatedAtDesc();
 }

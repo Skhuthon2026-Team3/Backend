@@ -163,18 +163,36 @@ class MemoryServiceTest {
         MemoryResponse thirdPublic = memoryService.createMemory(member.getId(), createRequest("Third public", true));
         Thread.sleep(5);
         MemoryResponse fourthPublic = memoryService.createMemory(member.getId(), createRequest("Fourth public", true));
+        Thread.sleep(5);
+        MemoryResponse fifthPublic = memoryService.createMemory(member.getId(), createRequest("Fifth public", true));
+        Thread.sleep(5);
+        MemoryResponse sixthPublic = memoryService.createMemory(member.getId(), createRequest("Sixth public", true));
+        Thread.sleep(5);
+        MemoryResponse seventhPublic = memoryService.createMemory(member.getId(), createRequest("Seventh public", true));
+        Thread.sleep(5);
+        MemoryResponse eighthPublic = memoryService.createMemory(member.getId(), createRequest("Eighth public", true));
+        Thread.sleep(5);
+        MemoryResponse ninthPublic = memoryService.createMemory(member.getId(), createRequest("Ninth public", true));
 
         List<MemoryListResponse> memories = memoryService.getRecentPublicMemories();
 
-        assertThat(memories).hasSize(3);
+        assertThat(memories).hasSize(8);
         assertThat(memories).extracting(MemoryListResponse::memoryId)
-                .containsExactly(fourthPublic.id(), thirdPublic.id(), secondPublic.id())
+                .containsExactly(
+                        ninthPublic.id(),
+                        eighthPublic.id(),
+                        seventhPublic.id(),
+                        sixthPublic.id(),
+                        fifthPublic.id(),
+                        fourthPublic.id(),
+                        thirdPublic.id(),
+                        secondPublic.id()
+                )
                 .doesNotContain(firstPublic.id());
         assertThat(memories).extracting(MemoryListResponse::title)
                 .doesNotContain("Private memory");
         assertThat(memories).allSatisfy(memory -> assertThat(memory.isPublic()).isTrue());
     }
-
     @Test
     void deleteMemory() {
         Member member = memberRepository.save(
