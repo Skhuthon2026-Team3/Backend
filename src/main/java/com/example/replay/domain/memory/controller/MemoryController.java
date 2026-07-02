@@ -5,6 +5,7 @@ import com.example.replay.domain.memory.dto.MemoryCreateRequest;
 import com.example.replay.domain.memory.dto.MemoryDetailResponse;
 import com.example.replay.domain.memory.dto.MemoryListResponse;
 import com.example.replay.domain.memory.dto.MemoryResponse;
+import com.example.replay.domain.memory.dto.MemoryUpdateRequest;
 import com.example.replay.domain.memory.service.MemoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +71,17 @@ public class MemoryController {
             @PathVariable Long memoryId
     ) {
         return ApiResponse.success(memoryService.getMyMemoryDetail(memoryId, memberId));
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Update memory", description = "Update a saved memory and selected music information by id.")
+    @PatchMapping("/{memoryId}")
+    public ApiResponse<MemoryDetailResponse> updateMemory(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable Long memoryId,
+            @Valid @RequestBody MemoryUpdateRequest request
+    ) {
+        return ApiResponse.success(memoryService.updateMemory(memberId, memoryId, request));
     }
 
     @SecurityRequirement(name = "bearerAuth")

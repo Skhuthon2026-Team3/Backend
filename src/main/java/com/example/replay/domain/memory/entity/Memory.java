@@ -54,7 +54,7 @@ public class Memory {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "ai_story", length = 100) //AI 글 작성 텍스트란 100자 제한
+    @Column(name = "ai_story", length = 100) // AI story text is limited to 100 characters
     private String aiStory;
 
     @Column(name = "is_public", nullable = false)
@@ -79,6 +79,28 @@ public class Memory {
             Boolean isPublic
     ) {
         this.member = member;
+        this.title = title;
+        this.trackName = trackName;
+        this.artistName = artistName;
+        this.albumName = albumName;
+        this.artworkUrl = artworkUrl;
+        this.previewUrl = previewUrl;
+        this.content = content;
+        this.aiStory = aiStory;
+        this.isPublic = isPublic;
+    }
+
+    public void update(
+            String title,
+            String trackName,
+            String artistName,
+            String albumName,
+            String artworkUrl,
+            String previewUrl,
+            String content,
+            String aiStory,
+            Boolean isPublic
+    ) {
         this.title = title;
         this.trackName = trackName;
         this.artistName = artistName;

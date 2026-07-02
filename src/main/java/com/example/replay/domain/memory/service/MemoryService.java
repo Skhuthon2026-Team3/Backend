@@ -8,6 +8,7 @@ import com.example.replay.domain.memory.dto.MemoryCreateRequest;
 import com.example.replay.domain.memory.dto.MemoryDetailResponse;
 import com.example.replay.domain.memory.dto.MemoryListResponse;
 import com.example.replay.domain.memory.dto.MemoryResponse;
+import com.example.replay.domain.memory.dto.MemoryUpdateRequest;
 import com.example.replay.domain.memory.entity.Memory;
 import com.example.replay.domain.memory.repository.MemoryRepository;
 import java.util.List;
@@ -75,6 +76,30 @@ public class MemoryService {
         return memoryRepository.findTop8ByIsPublicTrueOrderByCreatedAtDesc().stream()
                 .map(MemoryListResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public MemoryDetailResponse updateMemory(Long memberId, Long memoryId, MemoryUpdateRequest request) {
+        Memory memory = memoryRepository.findById(memoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMORY_NOT_FOUND));
+
+        if (!memory.getMember().getId().equals(memberId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_MEMORY_ACCESS);
+        }
+
+        memory.update(
+                request.title(),
+                request.trackName(),
+                request.artistName(),
+                request.albumName(),
+                request.artworkUrl(),
+                request.previewUrl(),
+                request.content(),
+                request.aiStory(),
+                request.isPublic()
+        );
+
+        return MemoryDetailResponse.from(memory);
     }
 
     @Transactional
