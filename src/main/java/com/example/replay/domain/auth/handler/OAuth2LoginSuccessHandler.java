@@ -29,7 +29,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     ) throws IOException, ServletException {
         OAuth2MemberPrincipal principal = (OAuth2MemberPrincipal) authentication.getPrincipal();
         String accessToken = jwtTokenProvider.createAccessToken(principal.getMemberId());
-        AuthTokenResponse tokenResponse = AuthTokenResponse.bearer(accessToken, principal.getMemberId());
+        AuthTokenResponse tokenResponse = AuthTokenResponse.bearer(
+                accessToken,
+                principal.getMemberId(),
+                principal.getEmail()
+        );
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
