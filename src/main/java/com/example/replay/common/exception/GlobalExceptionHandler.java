@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException exception
     ) {
-        String message = "\uD544\uC218 \uC694\uCCAD \uD30C\uB77C\uBBF8\uD130\uAC00 \uB204\uB77D\uB418\uC5C8\uC2B5\uB2C8\uB2E4: "
+        String message = "필수 요청 파라미터가 누락되었습니다: "
                 + exception.getParameterName();
         return ResponseEntity
                 .status(ErrorCode.INVALID_REQUEST.getStatus())

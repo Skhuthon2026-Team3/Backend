@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "AI", description = "AI memory generation API")
+@Tag(name = "AI", description = "AI 추억 생성 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ai")
@@ -25,9 +25,8 @@ public class AiController {
 
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
-            summary = "Generate AI memory draft",
-            description = "Generate a memory title and content from selected music information and user input. "
-                    + "This API does not save a Memory."
+            summary = "AI 추억 초안 생성",
+            description = "선택한 음악 정보와 사용자의 입력을 바탕으로 추억 제목과 본문 초안을 생성합니다. 이 API는 추억을 저장하지 않습니다."
     )
     @PostMapping("/memories/generate")
     public ApiResponse<AiMemoryGenerateResponse> generateMemory(

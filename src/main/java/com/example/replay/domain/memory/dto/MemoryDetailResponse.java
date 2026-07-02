@@ -1,23 +1,53 @@
 package com.example.replay.domain.memory.dto;
 
 import com.example.replay.domain.memory.entity.Memory;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
-//각 게시물 상세 정보 조회
+@Schema(description = "추억 상세 응답")
 public record MemoryDetailResponse(
+        @Schema(description = "추억 ID", example = "1")
         Long memoryId,
-        String title, //글 제목
-        String content, // 글 본문
-        String trackName, // 곡 제목
-        String artistName, // 가수명
-        String albumName, // 앨범명
-        String artworkUrl, // 앨범 커버 url
-        String previewUrl, // 미리듣기 url
-        Boolean isPublic, //공개여부
-        LocalDateTime createdAt //생성 시간
+
+        @Schema(description = "추억 제목", example = "밤샘의 조용한 동반자")
+        String title,
+
+        @Schema(description = "추억 본문", example = "기말고사를 앞두고 책상에 앉아 있던 밤...")
+        String content,
+
+        @Schema(description = "곡 제목", example = "Story")
+        String trackName,
+
+        @Schema(description = "아티스트 이름", example = "릴러말즈 & TOIL")
+        String artistName,
+
+        @Schema(description = "앨범 이름", example = "TOYSTORY3")
+        String albumName,
+
+        @Schema(description = "앨범 커버 이미지 URL", example = "https://example.com/artwork.jpg")
+        String artworkUrl,
+
+        @Schema(description = "미리 듣기 오디오 URL", example = "https://example.com/preview.m4a")
+        String previewUrl,
+
+        @Schema(description = "공개 여부", example = "true")
+        Boolean isPublic,
+
+        @Schema(description = "생성 시각", example = "2026-07-02T16:56:10.805275")
+        LocalDateTime createdAt,
+
+        @Schema(description = "좋아요 수", example = "3")
+        long likeCount,
+
+        @Schema(description = "현재 사용자의 좋아요 여부", example = "true")
+        boolean likedByMe
 ) {
 
     public static MemoryDetailResponse from(Memory memory) {
+        return from(memory, 0, false);
+    }
+
+    public static MemoryDetailResponse from(Memory memory, long likeCount, boolean likedByMe) {
         return new MemoryDetailResponse(
                 memory.getId(),
                 memory.getTitle(),
@@ -28,7 +58,9 @@ public record MemoryDetailResponse(
                 memory.getArtworkUrl(),
                 memory.getPreviewUrl(),
                 memory.getIsPublic(),
-                memory.getCreatedAt()
+                memory.getCreatedAt(),
+                likeCount,
+                likedByMe
         );
     }
 }

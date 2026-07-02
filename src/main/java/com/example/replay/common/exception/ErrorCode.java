@@ -13,6 +13,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "요청 값이 올바르지 않습니다."),
+    ALREADY_LIKED_MEMORY(HttpStatus.CONFLICT, "이미 좋아요한 추억입니다."),
+    MEMORY_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 찾을 수 없습니다."),
+    FORBIDDEN_PRIVATE_MEMORY_LIKE(HttpStatus.FORBIDDEN, "비공개 추억에는 좋아요를 누를 수 없습니다."),
     INVALID_AI_GENERATION_TYPE(HttpStatus.BAD_REQUEST, "AI generationType은 MEMORY_CONTENT이여야 합니다."),
     AI_SERVER_ERROR(HttpStatus.BAD_GATEWAY, "AI 서버 요청이 실패하였습니다."),
     AI_SERVER_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "AI 서버가 타임 아웃입니다.");
@@ -25,4 +28,3 @@ public enum ErrorCode {
         this.message = message;
     }
 }
-

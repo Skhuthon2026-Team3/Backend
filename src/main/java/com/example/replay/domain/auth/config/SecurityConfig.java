@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/music/search",
                                 "/api/memories/recent",
-                                "/api/memories/public/**"
+                                "/api/memories/public/**",
+                                "/api/memories/*/likes/status"
                         ).permitAll()
                         .requestMatchers(
                                 "/oauth2/**",

@@ -10,6 +10,7 @@ import com.example.replay.domain.memory.dto.MemoryListResponse;
 import com.example.replay.domain.memory.dto.MemoryResponse;
 import com.example.replay.domain.memory.dto.MemoryUpdateRequest;
 import com.example.replay.domain.memory.entity.Memory;
+import com.example.replay.domain.memory.repository.MemoryLikeRepository;
 import com.example.replay.domain.memory.repository.MemoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class MemoryService {
 
     private final MemberRepository memberRepository;
     private final MemoryRepository memoryRepository;
+    private final MemoryLikeRepository memoryLikeRepository;
 
     @Transactional
     public MemoryResponse createMemory(Long memberId, MemoryCreateRequest request) {
@@ -49,7 +51,7 @@ public class MemoryService {
         Member member = getMember(memberId);
 
         return memoryRepository.findByMemberOrderByCreatedAtDesc(member).stream()
-                .map(MemoryListResponse::from)
+                .map(memory -> toListResponse(memory, memberId))
                 .toList();
     }
 
@@ -60,21 +62,31 @@ public class MemoryService {
         Memory memory = memoryRepository.findByIdAndMember(memoryId, member)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMORY_NOT_FOUND));
 
-        return MemoryDetailResponse.from(memory);
+        return toDetailResponse(memory, memberId);
     }
 
     @Transactional(readOnly = true)
     public MemoryDetailResponse getPublicMemoryDetail(Long memoryId) {
+        return getPublicMemoryDetail(memoryId, null);
+    }
+
+    @Transactional(readOnly = true)
+    public MemoryDetailResponse getPublicMemoryDetail(Long memoryId, Long memberId) {
         Memory memory = memoryRepository.findByIdAndIsPublicTrue(memoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMORY_NOT_FOUND));
 
-        return MemoryDetailResponse.from(memory);
+        return toDetailResponse(memory, memberId);
     }
 
     @Transactional(readOnly = true)
     public List<MemoryListResponse> getRecentPublicMemories() {
+        return getRecentPublicMemories(null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemoryListResponse> getRecentPublicMemories(Long memberId) {
         return memoryRepository.findTop8ByIsPublicTrueOrderByCreatedAtDesc().stream()
-                .map(MemoryListResponse::from)
+                .map(memory -> toListResponse(memory, memberId))
                 .toList();
     }
 
@@ -99,7 +111,7 @@ public class MemoryService {
                 request.isPublic()
         );
 
-        return MemoryDetailResponse.from(memory);
+        return toDetailResponse(memory, memberId);
     }
 
     @Transactional
@@ -111,7 +123,28 @@ public class MemoryService {
             throw new BusinessException(ErrorCode.FORBIDDEN_MEMORY_ACCESS);
         }
 
+        memoryLikeRepository.deleteByMemoryId(memoryId);
         memoryRepository.delete(memory);
+    }
+
+    private MemoryListResponse toListResponse(Memory memory, Long memberId) {
+        return MemoryListResponse.from(
+                memory,
+                memoryLikeRepository.countByMemoryId(memory.getId()),
+                isLikedByMember(memberId, memory.getId())
+        );
+    }
+
+    private MemoryDetailResponse toDetailResponse(Memory memory, Long memberId) {
+        return MemoryDetailResponse.from(
+                memory,
+                memoryLikeRepository.countByMemoryId(memory.getId()),
+                isLikedByMember(memberId, memory.getId())
+        );
+    }
+
+    private boolean isLikedByMember(Long memberId, Long memoryId) {
+        return memberId != null && memoryLikeRepository.existsByMemberIdAndMemoryId(memberId, memoryId);
     }
 
     private Member getMember(Long memberId) {
